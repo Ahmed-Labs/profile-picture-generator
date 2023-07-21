@@ -20,5 +20,9 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  // remove dalle domain later
+  images: {
+    domains: ['oaidalleapiprodscus.blob.core.windows.net'],
+  },
 };
 export default config;
