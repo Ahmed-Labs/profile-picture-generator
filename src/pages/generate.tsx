@@ -72,7 +72,7 @@ const GeneratePage: NextPage = () => {
           <Button type="submit">Submit</Button>
         </form>
 
-        {imageUrl && <Image src={imageUrl} alt="generated icon" width={200} height={200} />}
+        {imageUrl && <img src={"data:image/png;base64, " + imageUrl} alt="generated icon" />}
       </main>
     </>
   );

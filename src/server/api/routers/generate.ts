@@ -8,7 +8,16 @@ import {
 
 import { Configuration, OpenAIApi } from "openai";
 import { env } from "~/env.mjs";
+import { b64Image } from "~/data/b64Image";
+import AWS from "aws-sdk";
 
+const s3 = new AWS.S3({
+  credentials: {
+    accessKeyId: env.ACCESS_KEY_ID,
+    secretAccessKey: env.SECRET_ACCESS_KEY,
+  },
+  region: "us-east-1",
+});
 const configuration = new Configuration({
   apiKey: env.DALLE_API_KEY,
 });
@@ -16,15 +25,16 @@ const openai = new OpenAIApi(configuration);
 
 async function generateIcon(prompt: string): Promise<string> {
   if (env.MOCK_DALLE === "true") {
-    return "https://oaidalleapiprodscus.blob.core.windows.net/private/org-IQg8ead6Ki4Dl8PV9khCC46H/user-NZ6TVdGruLzSqWgtxcbWyyeU/img-klRv4CtrQvAKpMvEpWwYOCda.png?st=2023-07-20T18%3A47%3A54Z&se=2023-07-20T20%3A47%3A54Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-07-19T20%3A04%3A40Z&ske=2023-07-20T20%3A04%3A40Z&sks=b&skv=2021-08-06&sig=gNlZRHrVerk14m3gsWV/fApBefx5ZDG3Q%2BmYEYoFc2A%3D";
+    return b64Image;
   } else {
     const response = await openai.createImage({
       prompt: prompt,
       n: 1,
-      size: "1024x1024",
+      size: "512x512",
+      response_format: "b64_json",
     });
 
-    return response.data.data[0]?.url!;
+    return response.data.data[0]?.b64_json!;
   }
 }
 
@@ -59,8 +69,25 @@ export const generateRouter = createTRPCRouter({
         });
       }
 
-      const url = await generateIcon(input.prompt);
+      const base64EncodedImage = await generateIcon(input.prompt);
 
-      return { imageUrl: url };
+      const icon = await ctx.prisma.icon.create({
+        data: {
+          prompt: input.prompt,
+          userId: ctx.session.user.id,
+        },
+      });
+
+      await s3
+        .putObject({
+          Bucket: "profile-pic-generator",
+          Body: Buffer.from(base64EncodedImage!, "base64"),
+          Key: icon.id,
+          ContentEncoding: "base64",
+          ContentType: "image/png",
+        })
+        .promise();
+
+      return { imageUrl: base64EncodedImage };
     }),
 });
