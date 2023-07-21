@@ -22,7 +22,9 @@ const config = {
   },
   // remove dalle domain later
   images: {
-    domains: ['oaidalleapiprodscus.blob.core.windows.net'],
+    domains: [
+      "profile-pic-generator.s3.amazonaws.com",
+    ],
   },
 };
 export default config;
