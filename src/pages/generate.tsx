@@ -1,14 +1,17 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Input from "~/components/input";
+import Input from "~/components/Input";
 import FormGroup from "~/components/FormGroup";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Button } from "~/components/Button";
 import Image from "next/image";
+import { useBuyCredits } from "~/hooks/useBuyCredits";
 
 const GeneratePage: NextPage = () => {
+  const { buyCredits } = useBuyCredits();
+
   const [form, setForm] = useState({
     prompt: "",
   });
@@ -54,13 +57,22 @@ const GeneratePage: NextPage = () => {
           </Button>
         )}
         {isLoggedIn && (
-          <Button
-            onClick={() => {
-              signOut().catch(console.error);
-            }}
-          >
-            Logout
-          </Button>
+          <>
+            <Button
+              onClick={() => {
+                buyCredits().catch(console.error);
+              }}
+            >
+              Buy Credits
+            </Button>
+            <Button
+              onClick={() => {
+                signOut().catch(console.error);
+              }}
+            >
+              Logout
+            </Button>
+          </>
         )}
         {session.data?.user.name}
         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
@@ -72,7 +84,9 @@ const GeneratePage: NextPage = () => {
           <Button type="submit">Submit</Button>
         </form>
 
-        {imageUrl && <Image src={imageUrl} alt="generated icon" height={400} width={400}/>}
+        {imageUrl && (
+          <Image src={imageUrl} alt="generated icon" height={400} width={400} />
+        )}
       </main>
     </>
   );
