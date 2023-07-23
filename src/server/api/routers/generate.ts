@@ -8,7 +8,6 @@ import {
 
 import { Configuration, OpenAIApi } from "openai";
 import { env } from "~/env.mjs";
-import { b64Image } from "~/data/b64Image";
 import AWS from "aws-sdk";
 
 const s3 = new AWS.S3({
@@ -28,7 +27,7 @@ const openai = new OpenAIApi(configuration);
 
 async function generateIcon(prompt: string): Promise<string> {
   if (env.MOCK_DALLE === "true") {
-    return b64Image;
+    return "";
   } else {
     const response = await openai.createImage({
       prompt: prompt,
