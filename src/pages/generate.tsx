@@ -1,16 +1,12 @@
 import { type NextPage } from "next";
-import Input from "~/components/Input";
-import FormGroup from "~/components/FormGroup";
 import { useState } from "react";
-import { api } from "~/utils/api";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { Button } from "~/components/Button";
 import Image from "next/image";
-import { useBuyCredits } from "~/hooks/useBuyCredits";
+import { Button } from "~/components/Button";
+import { Input } from "../components/Input";
+import { FormGroup } from "~/components/FormGroup";
+import { api } from "~/utils/api";
 
 const GeneratePage: NextPage = () => {
-  const { buyCredits } = useBuyCredits();
-
   const [form, setForm] = useState({
     prompt: "",
   });
@@ -35,12 +31,9 @@ const GeneratePage: NextPage = () => {
     setForm({ prompt: "" });
   }
 
-  const session = useSession();
-  const isLoggedIn = !!session.data;
-
   return (
     <>
-      <main className="container mx-auto mt-24 flex min-h-screen flex-col gap-4 px-24 max-w-6xl">
+      <main className="container mx-auto mt-24 flex min-h-screen max-w-6xl flex-col gap-4 px-24">
         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
           <FormGroup>
             <label>Prompt</label>
