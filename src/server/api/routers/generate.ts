@@ -25,19 +25,15 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-async function generateIcon(prompt: string): Promise<string> {
-  if (env.MOCK_DALLE === "true") {
-    return "";
-  } else {
-    const response = await openai.createImage({
-      prompt: prompt,
-      n: 1,
-      size: "512x512",
-      response_format: "b64_json",
-    });
+async function generateIcon(prompt: string): Promise<string | undefined> {
+  const response = await openai.createImage({
+    prompt: prompt,
+    n: 1,
+    size: "512x512",
+    response_format: "b64_json",
+  });
 
-    return response.data.data[0]?.b64_json!;
-  }
+  return response.data.data[0]?.b64_json;
 }
 
 export const generateRouter = createTRPCRouter({
@@ -71,6 +67,12 @@ export const generateRouter = createTRPCRouter({
         });
       }
 
+      if (env.MOCK_DALLE === "true") {
+        return {
+          imageUrl:
+            "https://profile-pic-generator.s3.amazonaws.com/clkcuewyw0001ritv5ohrcm8n",
+        };
+      }
       const base64EncodedImage = await generateIcon(input.prompt);
 
       const icon = await ctx.prisma.icon.create({
