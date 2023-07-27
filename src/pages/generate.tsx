@@ -40,19 +40,35 @@ const GeneratePage: NextPage = () => {
 
   return (
     <>
-      <main className="flex min-h-screen flex-col items-center justify-center">
-        {session.data?.user.name}
+      <main className="container mx-auto mt-24 flex min-h-screen flex-col gap-4 px-24 max-w-6xl">
         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
           <FormGroup>
             <label>Prompt</label>
             <Input onChange={updateForm("prompt")} value={form.prompt} />
           </FormGroup>
 
-          <Button type="submit">Submit</Button>
+          <Button
+            disabled={generateIcon.isLoading}
+            isLoading={generateIcon.isLoading}
+            type="submit"
+          >
+            Submit
+          </Button>
         </form>
 
         {imageUrl && (
-          <Image src={imageUrl} alt="generated icon" height={400} width={400} />
+          <>
+            <h2>Your icons:</h2>
+            <section className="grid grid-cols-4 gap-4">
+              <Image
+                src={imageUrl}
+                className="w-full"
+                alt="generated icon"
+                height={400}
+                width={400}
+              />
+            </section>
+          </>
         )}
       </main>
     </>
